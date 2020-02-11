@@ -19,9 +19,9 @@ import json
 import os
 import tensorflow as tf
 
-import model
-import util
-import wals
+import trainer.model as model
+import trainer.util as util
+import trainer.wals as wals
 
 
 def main(args):
@@ -44,8 +44,8 @@ def main(args):
     # write test_rmse metric for hyperparam tuning
     util.write_hptuning_metric(args, test_rmse)
 
-  tf.logging.info('train RMSE = %.2f' % train_rmse)
-  tf.logging.info('test RMSE = %.2f' % test_rmse)
+  tf.compat.v1.logging.info('train RMSE = %.2f' % train_rmse)
+  tf.compat.v1.logging.info('test RMSE = %.2f' % test_rmse)
 
 
 def parse_arguments():
@@ -173,7 +173,7 @@ def parse_arguments():
     output_dir = job_dir
 
   if args.verbose_logging:
-    tf.logging.set_verbosity(tf.logging.INFO)
+    tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
 
   # Find out if there's a task value on the environment variable.
   # If there is none or it is empty define a default one.
@@ -182,7 +182,7 @@ def parse_arguments():
 
   # update default params with any args provided to task
   params = model.DEFAULT_PARAMS
-  params.update({k: arg for k, arg in arguments.iteritems() if arg is not None})
+  params.update({k: arg for k, arg in arguments.items() if arg is not None})
   if args.use_optimized:
     if args.data_type == 'web_views':
       params.update(model.OPTIMIZED_PARAMS_WEB)

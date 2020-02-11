@@ -22,7 +22,7 @@ from scipy.sparse import coo_matrix
 import sh
 import tensorflow as tf
 
-import wals
+import trainer.wals as wals
 
 # ratio of train set size to test set size
 TEST_SET_RATIO = 10
@@ -116,8 +116,8 @@ def _ratings_train_and_test(use_headers, delimiter, input_file):
                                'timestamp': np.int32,
                            })
 
-  np_users = ratings_df.user_id.as_matrix()
-  np_items = ratings_df.item_id.as_matrix()
+  np_users = ratings_df.user_id.values
+  np_items = ratings_df.item_id.values
   unique_users = np.unique(np_users)
   unique_items = np.unique(np_items)
 
@@ -147,7 +147,7 @@ def _ratings_train_and_test(use_headers, delimiter, input_file):
     ratings[:, 1] = i_r
     ratings[:, 2] = np_ratings
   else:
-    ratings = ratings_df.as_matrix(['user_id', 'item_id', 'rating'])
+    ratings = ratings_df[['user_id', 'item_id', 'rating']].values
     # deal with 1-based user indices
     ratings[:, 0] -= 1
     ratings[:, 1] -= 1
@@ -227,8 +227,8 @@ def _create_sparse_train_and_test(ratings, n_users, n_items):
      train, test sparse matrices in scipy coo_matrix format.
   """
   # pick a random test set of entries, sorted ascending
-  test_set_size = len(ratings) / TEST_SET_RATIO
-  test_set_idx = np.random.choice(xrange(len(ratings)),
+  test_set_size = round(len(ratings) / TEST_SET_RATIO)
+  test_set_idx = np.random.choice(range(len(ratings)),
                                   size=test_set_size, replace=False)
   test_set_idx = sorted(test_set_idx)
 
@@ -264,7 +264,7 @@ def train_model(args, tr_sparse):
   feature_wt_exp = args['feature_wt_exp']
   obs_wt = args['feature_wt_factor']
 
-  tf.logging.info('Train Start: {:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now()))
+  tf.compat.v1.logging.info('Train Start: {:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now()))
 
   # generate model
   input_tensor, row_factor, col_factor, model = wals.wals_model(tr_sparse,
@@ -279,7 +279,7 @@ def train_model(args, tr_sparse):
   # factorize matrix
   session = wals.simple_train(model, input_tensor, num_iters)
 
-  tf.logging.info('Train Finish: {:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now()))
+  tf.compat.v1.logging.info('Train Finish: {:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now()))
 
   # evaluate output factor matrices
   output_row = row_factor.eval(session=session)

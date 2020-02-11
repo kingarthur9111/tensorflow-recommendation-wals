@@ -7,5 +7,7 @@ logs
 jobs
 wals_ml_engine.egg-info
 dist
+data
+ml-*
 airflow/deploy/config/settings.yaml
 airflow/deploy/deployment-settings.yaml

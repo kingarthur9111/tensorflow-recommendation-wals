@@ -33,7 +33,7 @@ def get_rmse(output_row, output_col, actual):
     rmse
   """
   mse = 0
-  for i in xrange(actual.data.shape[0]):
+  for i in range(actual.data.shape[0]):
     row_pred = output_row[actual.row[i]]
     col_pred = output_col[actual.col[i]]
     err = actual.data[i] - np.dot(row_pred, col_pred)
@@ -54,7 +54,7 @@ def simple_train(model, input_tensor, num_iterations):
   Returns:
     tensorflow session, for evaluating results
   """
-  sess = tf.Session(graph=input_tensor.graph)
+  sess = tf.compat.v1.Session(graph=input_tensor.graph)
 
   with input_tensor.graph.as_default():
     row_update_op = model.update_row_factors(sp_input=input_tensor)[1]
@@ -62,7 +62,7 @@ def simple_train(model, input_tensor, num_iterations):
 
     sess.run(model.initialize_op)
     sess.run(model.worker_init)
-    for _ in xrange(num_iterations):
+    for _ in range(num_iterations):
       sess.run(model.row_update_prep_gramian_op)
       sess.run(model.initialize_row_update_op)
       sess.run(row_update_op)
@@ -91,8 +91,12 @@ def make_wts(data, wt_type, obs_wt, feature_wt_exp, axis):
     vector of weights for cols (items) or rows (users)
   """
   # recipricol of sum of number of items across rows (if axis is 0)
-  frac = np.array(1.0/(data > 0.0).sum(axis))
-
+  #frac = np.array(1.0/(data > 0.0).sum(axis))
+  tr_mask = (data > 0.0).sum(axis)
+  frac = np.array(np.divide(1.0, 
+                            tr_mask, 
+                            out=np.zeros_like(1.0, shape=tr_mask.shape), 
+                            where=tr_mask!=0))
   # filter any invalid entries
   frac[np.ma.masked_invalid(frac).mask] = 0.0
 
@@ -144,7 +148,7 @@ def wals_model(data, dim, reg, unobs, weights=False,
 
   with tf.Graph().as_default():
 
-    input_tensor = tf.SparseTensor(indices=zip(data.row, data.col),
+    input_tensor = tf.SparseTensor(indices=list(zip(data.row, data.col)),
                                    values=(data.data).astype(np.float32),
                                    dense_shape=data.shape)
 
