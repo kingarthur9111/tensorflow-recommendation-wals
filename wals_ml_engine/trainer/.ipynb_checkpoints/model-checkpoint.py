@@ -173,46 +173,28 @@ def _page_views_train_and_test(input_file):
     sparse coo_matrix for test
   """
   views_df = pd.read_csv(input_file, sep=',', header=0)
-
-  df_items = pd.DataFrame({'contentId': views_df.contentId.unique()})
-  df_sorted_items = df_items.sort_values('contentId').reset_index()
-  pds_items = df_sorted_items.contentId
-
-  # preprocess data. df.groupby.agg sorts clientId and contentId
-  df_user_items = views_df.groupby(['clientId', 'contentId']
-                                  ).agg({'timeOnPage': 'sum'})
-
+  unique_items = views_df.sort_values(['contentId'])['contentId'].unique()
+  unique_users = views_df.sort_values(['clientId'])['clientId'].unique()
+  n_items = len(unique_items)
+  n_users = len(unique_users)
+  item_dict = dict(zip(unique_items, list(range(n_items))))
+  user_dict = dict(zip(unique_users, list(range(n_users))))
+  views_df['ux'] = list(map(user_dict.get, views_df['clientId']))
+  views_df['ix'] = list(map(item_dict.get, views_df['contentId']))
+  
   # create a list of (userId, itemId, timeOnPage) ratings, where userId and
   # clientId are 0-indexed
-  current_u = -1
-  ux = -1
-  pv_ratings = []
-  user_ux = []
-  for timeonpg in df_user_items.itertuples():
-    user = timeonpg[0][0]
-    item = timeonpg[0][1]
-
-    # as we go, build a (sorted) list of user ids
-    if user != current_u:
-      user_ux.append(user)
-      ux += 1
-      current_u = user
-
-    # this search makes the preprocessing time O(r * i log(i)),
-    # r = # ratings, i = # items
-    ix = pds_items.searchsorted(item)[0]
-    pv_ratings.append((ux, ix, timeonpg[1]))
-
+  pv_ratings = views_df.groupby(['ux', 'ix'])['timeOnPage'].sum().reset_index()
+  
   # convert ratings list and user map to np array
   pv_ratings = np.asarray(pv_ratings)
-  user_ux = np.asarray(user_ux)
 
   # create train and test sets
   tr_sparse, test_sparse = _create_sparse_train_and_test(pv_ratings,
-                                                         ux + 1,
-                                                         df_items.size)
+                                                         n_users,
+                                                         n_items)
 
-  return user_ux, pds_items.as_matrix(), tr_sparse, test_sparse
+  return unique_users, unique_items, tr_sparse, test_sparse
 
 
 def _create_sparse_train_and_test(ratings, n_users, n_items):
