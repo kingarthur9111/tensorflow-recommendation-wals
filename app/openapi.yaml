@@ -18,7 +18,7 @@ info:
   description: "Get recommended items for a User given their ID."
   version: "1.0.0"
 # This field will be replaced by the deploy_api.sh script.
-host: "YOUR-PROJECT-ID.appspot.com"
+host: "log-dot-YOUR-PROJECT-ID.appspot.com"
 schemes:
   - "https"
 paths:

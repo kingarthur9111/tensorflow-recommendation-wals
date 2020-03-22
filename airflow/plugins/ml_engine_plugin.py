@@ -161,6 +161,8 @@ class MLEngineTrainingOperator(BaseOperator):
                job_id,
                package_uris,
                training_python_module,
+               python_version,
+               runtime_version,
                training_args,
                region,
                scale_tier=None,
@@ -175,6 +177,8 @@ class MLEngineTrainingOperator(BaseOperator):
     self._job_id = job_id
     self._package_uris = package_uris
     self._training_python_module = training_python_module
+    self._python_version = python_version
+    self._runtime_version = runtime_version
     self._training_args = training_args
     self._region = region
     self._scale_tier = scale_tier
@@ -211,6 +215,8 @@ class MLEngineTrainingOperator(BaseOperator):
             'scaleTier': self._scale_tier,
             'packageUris': self._package_uris,
             'pythonModule': self._training_python_module,
+            'pythonVersion': self._python_version,
+            'runtimeVersion': self._runtime_version,
             'region': self._region,
             'args': self._training_args,
             'masterType': self._master_type

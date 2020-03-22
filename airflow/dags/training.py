@@ -40,7 +40,7 @@ PROJECT_ID = _get_project_id()
 
 # Data set constants, used in BigQuery tasks.  You can change these
 # to conform to your data.
-DATASET = 'GA360_test'
+DATASET = 'logdata'
 TABLE_NAME = 'ga_sessions_sample'
 ARTICLE_CUSTOM_DIMENSION = '10'
 
@@ -139,6 +139,8 @@ t3 = MLEngineTrainingOperator(
     job_id=job_id,
     package_uris=[PACKAGE_URI],
     training_python_module='trainer.task',
+    python_version='3.7',
+    runtime_version='1.15',
     training_args=training_args,
     region=REGION,
     scale_tier='CUSTOM',
@@ -151,7 +153,7 @@ t3 = MLEngineTrainingOperator(
 t4 = AppEngineVersionOperator(
     task_id='app_engine_deploy_version',
     project_id=PROJECT_ID,
-    service_id='default',
+    service_id='log',
     region=REGION,
     service_spec=None,
     dag=dag

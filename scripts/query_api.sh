@@ -24,8 +24,8 @@ main() {
     exit 1
   fi
   # Because our included app uses query string parameters, we can include
-  # them directly in the URL.
-  QUERY="curl \"https://${project_id}.appspot.com/recommendation?userId=${USER_ID}&numRecs=${NUM_RECS}\""
+  # them directly in the URL.log-dot-teamc-258806.appspot.com
+  QUERY="curl \"https://log-dot-${project_id}.appspot.com/recommendation?userId=${USER_ID}&numRecs=${NUM_RECS}\""
   # First, (maybe) print the command so the user can see what's being executed.
   if [[ "$QUIET" == "false" ]]; then
     echo "$QUERY"

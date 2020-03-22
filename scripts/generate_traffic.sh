@@ -23,7 +23,7 @@ main() {
   if [[ -z "$project_id" ]]; then
     exit 1
   fi
-  local url="https://${project_id}.appspot.com/recommendation?userId=${USER_ID}&numRecs=${NUM_RECS}"
+  local url="https://log-dot-${project_id}.appspot.com/recommendation?userId=${USER_ID}&numRecs=${NUM_RECS}"
   echo "This command will exit automatically in $TIMEOUT_SECONDS seconds."
   echo "Generating traffic to ${url}..."
   echo "Press Ctrl-C to stop."

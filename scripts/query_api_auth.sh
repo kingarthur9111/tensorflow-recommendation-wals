@@ -25,7 +25,7 @@ main() {
   fi
   # Because our included app uses query string parameters, we can include
   # them directly in the URL. We use -H to specify a header with our API key.
-  QUERY="curl -H 'x-api-key: $API_KEY' \"https://${project_id}.appspot.com/recommendation?userId=${USER_ID}\""
+  QUERY="curl -H 'x-api-key: $API_KEY' \"https://log-dot-${project_id}.appspot.com/recommendation?userId=${USER_ID}\""
   # First, print the command so the user can see what's being executed.
   echo "$QUERY"
   # Then actually execute it.

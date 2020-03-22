@@ -30,7 +30,7 @@ main() {
 
   # Prepare the necessary variables for substitution in our app configuration
   # template, and create a temporary file to hold the templatized version.
-  local service_name="${project_id}.appspot.com"
+  local service_name="log.${project_id}.appspot.com"
   local config_id=$(get_latest_config_id "$service_name")
   export TEMP_FILE="${APP}_deploy.yaml"
   < "$APP" \
